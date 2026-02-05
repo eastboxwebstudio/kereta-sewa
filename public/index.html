@@ -31,8 +31,11 @@
 
     <!-- === ADMIN HEADER === -->
     <header id="admin-header" class="hidden sticky top-0 z-40 bg-gray-900 text-white shadow-sm px-4 py-4 flex justify-between items-center">
-        <div>
+        <div class="flex items-center gap-3">
             <h1 class="text-xl font-bold">Admin Panel</h1>
+            <button onclick="resetDatabase()" class="text-xs bg-gray-700 hover:bg-gray-600 text-yellow-400 px-2 py-1 rounded border border-gray-600" title="Fix Database Schema">
+                <i class="fas fa-database"></i> Reset DB
+            </button>
         </div>
         <button onclick="logout()" class="text-sm bg-red-600 px-3 py-1 rounded">Logout</button>
     </header>
@@ -201,6 +204,7 @@
         const API_CARS = "/api/cars";
         const API_BOOKINGS = "/api/bookings";
         const API_ADMIN_LOGIN = "/api/login";
+        const API_ADMIN_RESET = "/api/admin/reset";
         const API_ADMIN_CARS = "/api/admin/cars";
         const API_ADMIN_BOOKINGS = "/api/admin/bookings";
 
@@ -384,6 +388,27 @@
             window.location.hash = '#login';
         };
 
+        // --- ADMIN: RESET DB ---
+        window.resetDatabase = async () => {
+            if(!confirm("AMARAN: Ini akan memadam semua data (kereta & booking) dan reset kepada asal. Teruskan?")) return;
+            
+            try {
+                const res = await fetch(API_ADMIN_RESET, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert("Database berjaya di-reset! Halaman akan di-refresh.");
+                    location.reload();
+                } else {
+                    alert("Gagal reset: " + data.error);
+                }
+            } catch(e) {
+                alert("Ralat sambungan: " + e.message);
+            }
+        };
+
         // --- ADMIN: DASHBOARD ---
         function switchAdminTab(tab) {
             document.getElementById('admin-orders-view').className = tab === 'orders' ? 'block' : 'hidden';
@@ -503,13 +528,22 @@
 
                 if (!res.ok) {
                     const errData = await res.json();
+                    // Provide a smart hint if it's the specific schema error
+                    if(errData.error && errData.error.includes("no column named category")) {
+                        if(confirm("Database anda menggunakan versi lama. Sila klik OK untuk reset database sekarang.")) {
+                            await resetDatabase();
+                            return;
+                        }
+                    }
                     throw new Error(errData.error || "Ralat pelayan");
                 }
                 
                 closeModal('admin-car-modal');
                 loadAdminData();
             } catch (err) {
-                alert("Gagal simpan: " + err.message);
+                if(!err.message.includes("reset database")) { // Don't alert if we just handled the reset flow
+                    alert("Gagal simpan: " + err.message);
+                }
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
