@@ -1,13 +1,15 @@
-name = "sewa-kereta-app"
+name = "kereta-sewa"
 main = "src/index.ts"
-compatibility_date = "2024-05-02"
+compatibility_date = "2024-09-25"
 
-# Configuration for serving static assets (frontend)
-[site]
-bucket = "./public"
+# Modern configuration for serving static assets (frontend)
+[assets]
+directory = "./public"
+binding = "ASSETS"
 
 # Database binding
 [[d1_databases]]
 binding = "DB"
 database_name = "sewa_kereta_db"
-database_id = "your-database-id-here" # Replace with actual D1 ID after creation
+# This is a placeholder UUID. Run 'npx wrangler d1 info sewa_kereta_db' to get your actual ID.
+database_id = "34947910-2e63-44f2-9856-5085c8892f30"

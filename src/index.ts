@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import type { D1Database } from '@cloudflare/workers-types'
+import type { D1Database, Fetcher } from '@cloudflare/workers-types'
 
 // Define the shape of our Cloudflare bindings
 type Bindings = {
   DB: D1Database
+  ASSETS: Fetcher
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -48,6 +49,11 @@ app.get('/api/cars/:id', async (c) => {
   } catch (e) {
     return c.json({ error: 'Failed to fetch car details' }, 500)
   }
+})
+
+// Serve static assets (frontend) via Workers Assets binding
+app.get('/*', (c) => {
+  return c.env.ASSETS.fetch(c.req.raw)
 })
 
 export default app
