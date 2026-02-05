@@ -95,15 +95,24 @@ app.get('/api/admin/bookings', adminAuth, async (c) => {
  * Add a new car
  */
 app.post('/api/admin/cars', adminAuth, async (c) => {
-  const body = await c.req.json()
-  const { name, category, image_url, price_per_day, transmission } = body
-  
-  await c.env.DB.prepare(`
-    INSERT INTO cars (name, category, image_url, price_per_day, transmission, status)
-    VALUES (?, ?, ?, ?, ?, 'Available')
-  `).bind(name, category, image_url, price_per_day, transmission).run()
-  
-  return c.json({ success: true })
+  try {
+    const body = await c.req.json()
+    const { name, category, image_url, price_per_day, transmission, status } = body
+    
+    // Ensure price is a number and provide defaults
+    const price = parseFloat(price_per_day)
+    const carStatus = status || 'Available'
+
+    const res = await c.env.DB.prepare(`
+      INSERT INTO cars (name, category, image_url, price_per_day, transmission, status)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(name, category, image_url, price, transmission, carStatus).run()
+    
+    return c.json({ success: true, id: res.meta.last_row_id })
+  } catch (e: any) {
+    console.error("Error adding car:", e)
+    return c.json({ success: false, error: e.message }, 500)
+  }
 })
 
 /**
@@ -111,17 +120,24 @@ app.post('/api/admin/cars', adminAuth, async (c) => {
  * Update car details/status
  */
 app.put('/api/admin/cars/:id', adminAuth, async (c) => {
-  const id = c.req.param('id')
-  const body = await c.req.json()
-  const { name, category, image_url, price_per_day, transmission, status } = body
+  try {
+    const id = c.req.param('id')
+    const body = await c.req.json()
+    const { name, category, image_url, price_per_day, transmission, status } = body
+    
+    const price = parseFloat(price_per_day)
 
-  await c.env.DB.prepare(`
-    UPDATE cars 
-    SET name=?, category=?, image_url=?, price_per_day=?, transmission=?, status=?
-    WHERE id=?
-  `).bind(name, category, image_url, price_per_day, transmission, status, id).run()
+    await c.env.DB.prepare(`
+      UPDATE cars 
+      SET name=?, category=?, image_url=?, price_per_day=?, transmission=?, status=?
+      WHERE id=?
+    `).bind(name, category, image_url, price, transmission, status, id).run()
 
-  return c.json({ success: true })
+    return c.json({ success: true })
+  } catch (e: any) {
+    console.error("Error updating car:", e)
+    return c.json({ success: false, error: e.message }, 500)
+  }
 })
 
 /**
@@ -129,9 +145,13 @@ app.put('/api/admin/cars/:id', adminAuth, async (c) => {
  * Remove a car
  */
 app.delete('/api/admin/cars/:id', adminAuth, async (c) => {
-  const id = c.req.param('id')
-  await c.env.DB.prepare("DELETE FROM cars WHERE id=?").bind(id).run()
-  return c.json({ success: true })
+  try {
+    const id = c.req.param('id')
+    await c.env.DB.prepare("DELETE FROM cars WHERE id=?").bind(id).run()
+    return c.json({ success: true })
+  } catch (e: any) {
+    return c.json({ success: false, error: e.message }, 500)
+  }
 })
 
 // Serve static assets
