@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS cars;
+DROP TABLE IF EXISTS bookings;
 
 CREATE TABLE cars (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,7 +11,22 @@ CREATE TABLE cars (
   status TEXT DEFAULT 'Available'
 );
 
--- Data Demo Lengkap (Konteks Malaysia)
+CREATE TABLE bookings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  car_id INTEGER NOT NULL,
+  car_name TEXT NOT NULL,
+  customer_name TEXT, 
+  customer_phone TEXT,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  total_days INTEGER NOT NULL,
+  total_price REAL NOT NULL,
+  status TEXT DEFAULT 'Pending', -- Pending, Confirmed, Completed, Cancelled
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(car_id) REFERENCES cars(id)
+);
+
+-- Data Demo Lengkap
 INSERT INTO cars (name, category, image_url, price_per_day, transmission, status) VALUES 
 ('Perodua Axia 1.0 G', 'Ekonomi', 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=400&q=80', 80.00, 'Auto', 'Available'),
 ('Proton Saga Premium', 'Sedan', 'https://images.unsplash.com/photo-1626847037657-fd3622613ce3?auto=format&fit=crop&w=400&q=80', 90.00, 'Auto', 'Available'),
