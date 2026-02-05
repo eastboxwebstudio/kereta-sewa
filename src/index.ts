@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import type { D1Database, Fetcher } from '@cloudflare/workers-types'
 
 // Define the shape of our Cloudflare bindings
 type Bindings = {
