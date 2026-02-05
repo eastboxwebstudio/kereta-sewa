@@ -1,0 +1,13 @@
+name = "sewa-kereta-app"
+main = "src/index.ts"
+compatibility_date = "2024-05-02"
+
+# Configuration for serving static assets (frontend)
+[site]
+bucket = "./public"
+
+# Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "sewa_kereta_db"
+database_id = "your-database-id-here" # Replace with actual D1 ID after creation

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sewa Kereta Murah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        /* Hide scrollbar for clean mobile look in horizontal lists if needed */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased pb-20">
+
+    <!-- Header (Sticky) -->
+    <header class="sticky top-0 z-40 bg-white shadow-sm px-4 py-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-blue-700 tracking-tight">SewaKereta<span class="text-blue-500">Murah</span></h1>
+            <p class="text-xs text-gray-500">Pantas. Mudah. Berbaloi.</p>
+        </div>
+        <button class="text-gray-600 focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-md mx-auto px-4 py-6">
+        
+        <!-- Hero/Promo Banner -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl p-6 text-white mb-6 shadow-lg">
+            <h2 class="text-2xl font-bold mb-1">Promosi Merdeka!</h2>
+            <p class="text-sm opacity-90 mb-3">Dapatkan diskaun sehingga 10% untuk tempahan 3 hari ke atas.</p>
+            <button class="bg-white text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-100 transition">Lihat Tawaran</button>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-2">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap shadow-md">Semua</button>
+            <button class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">Ekonomi</button>
+            <button class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">MPV</button>
+            <button class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap">Sedan</button>
+        </div>
+
+        <!-- Car List Container -->
+        <div id="car-list" class="space-y-4">
+            <!-- Loading Skeleton -->
+            <div class="animate-pulse space-y-4">
+                <div class="bg-white rounded-2xl p-4 shadow-sm h-64"></div>
+                <div class="bg-white rounded-2xl p-4 shadow-sm h-64"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Booking Modal (Overlay) -->
+    <div id="booking-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-end sm:items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+        <!-- Modal Content -->
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl transform transition-transform duration-300 translate-y-full sm:translate-y-0" id="modal-content">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-900">Butiran Tempahan</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-2">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Selected Car Info -->
+            <div class="flex items-center gap-4 mb-6 bg-blue-50 p-3 rounded-xl border border-blue-100">
+                <img id="modal-car-image" src="" class="w-20 h-14 object-cover rounded-lg shadow-sm" alt="Selected Car">
+                <div>
+                    <h4 id="modal-car-name" class="font-bold text-gray-800 text-sm"></h4>
+                    <p id="modal-car-price" class="text-blue-600 text-xs font-semibold"></p>
+                    <span id="modal-car-trans" class="text-[10px] bg-white border border-blue-200 px-1.5 py-0.5 rounded text-gray-500 uppercase"></span>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <form id="booking-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Tarikh Mula</label>
+                        <input type="date" id="start-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Tarikh Tamat</label>
+                        <input type="date" id="end-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="border-t border-dashed border-gray-200 pt-4 mt-2">
+                    <div class="flex justify-between items-center text-sm mb-1">
+                        <span class="text-gray-500">Tempoh Sewaan</span>
+                        <span class="font-medium" id="duration-display">0 Hari</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold text-blue-700">
+                        <span>Jumlah Harga</span>
+                        <span id="total-price-display">RM 0.00</span>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Button -->
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-200 flex items-center justify-center gap-2 transition transform active:scale-95">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    <span>Hantar Booking ke WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const WHATSAPP_PHONE = "60123456789"; // Replace with actual number
+        const API_URL = "/api/cars";
+
+        // --- State ---
+        let cars = [];
+        let selectedCar = null;
+
+        // --- Utils ---
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount);
+        };
+
+        const getDaysDiff = (start, end) => {
+            const date1 = new Date(start);
+            const date2 = new Date(end);
+            if (isNaN(date1) || isNaN(date2)) return 0;
+            const diffTime = date2 - date1;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays > 0 ? diffDays : 0; // Ensure minimum 0 (or 1 depending on logic)
+        };
+
+        // --- DOM Elements ---
+        const carListEl = document.getElementById('car-list');
+        const modalEl = document.getElementById('booking-modal');
+        const modalContentEl = document.getElementById('modal-content');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const durationDisplay = document.getElementById('duration-display');
+        const totalDisplay = document.getElementById('total-price-display');
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCars();
+            
+            // Set today's date as min date
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.min = today;
+            endDateInput.min = today;
+        });
+
+        // --- Logic ---
+        async function fetchCars() {
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Network response was not ok");
+                cars = await res.json();
+                renderCars();
+            } catch (error) {
+                console.error("Error fetching cars:", error);
+                carListEl.innerHTML = `<div class="text-center p-8 text-gray-500">Gagal memuat turun data kereta.<br>Sila cuba sebentar lagi.</div>`;
+            }
+        }
+
+        function renderCars() {
+            carListEl.innerHTML = '';
+            
+            if (cars.length === 0) {
+                carListEl.innerHTML = '<div class="text-center p-4">Tiada kereta tersedia buat masa ini.</div>';
+                return;
+            }
+
+            cars.forEach(car => {
+                const isAvailable = car.status === 'Available';
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow";
+                
+                card.innerHTML = `
+                    <div class="relative h-48 w-full">
+                        <img src="${car.image_url}" alt="${car.name}" class="w-full h-full object-cover">
+                        ${!isAvailable ? 
+                            `<div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Telah Disewa</span>
+                            </div>` 
+                            : ''
+                        }
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                            <i class="fas fa-cogs text-gray-500"></i> ${car.transmission}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight">${car.name}</h3>
+                            <div class="text-right">
+                                <p class="text-blue-600 font-bold text-lg leading-none">${formatCurrency(car.price_per_day)}</p>
+                                <p class="text-[10px] text-gray-400">/hari</p>
+                            </div>
+                        </div>
+                        <button 
+                            onclick="openModal(${car.id})" 
+                            class="w-full mt-2 py-3 rounded-xl font-bold text-sm transition-colors ${isAvailable ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 shadow-lg' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}" 
+                            ${!isAvailable ? 'disabled' : ''}>
+                            ${isAvailable ? 'Pilih Kereta' : 'Tidak Tersedia'}
+                        </button>
+                    </div>
+                `;
+                carListEl.appendChild(card);
+            });
+        }
+
+        // --- Modal Logic ---
+        window.openModal = (carId) => {
+            selectedCar = cars.find(c => c.id === carId);
+            if (!selectedCar) return;
+
+            // Populate Modal Info
+            document.getElementById('modal-car-image').src = selectedCar.image_url;
+            document.getElementById('modal-car-name').textContent = selectedCar.name;
+            document.getElementById('modal-car-price').textContent = `${formatCurrency(selectedCar.price_per_day)} / hari`;
+            document.getElementById('modal-car-trans').textContent = selectedCar.transmission;
+
+            // Reset inputs
+            startDateInput.value = '';
+            endDateInput.value = '';
+            durationDisplay.textContent = '0 Hari';
+            totalDisplay.textContent = formatCurrency(0);
+
+            // Show Modal
+            modalEl.classList.remove('hidden');
+            setTimeout(() => {
+                modalContentEl.classList.remove('translate-y-full');
+            }, 10);
+        };
+
+        window.closeModal = () => {
+            modalContentEl.classList.add('translate-y-full');
+            setTimeout(() => {
+                modalEl.classList.add('hidden');
+            }, 300); // Match transition duration
+        };
+
+        // Close on backdrop click
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) closeModal();
+        });
+
+        // --- Calculation Logic ---
+        function updateCalculation() {
+            if (!startDateInput.value || !endDateInput.value || !selectedCar) return;
+
+            const days = getDaysDiff(startDateInput.value, endDateInput.value);
+            
+            if (days <= 0) {
+                durationDisplay.textContent = "Tarikh tidak sah";
+                totalDisplay.textContent = "-";
+                return;
+            }
+
+            const total = days * selectedCar.price_per_day;
+
+            durationDisplay.textContent = `${days} Hari`;
+            totalDisplay.textContent = formatCurrency(total);
+        }
+
+        startDateInput.addEventListener('change', updateCalculation);
+        endDateInput.addEventListener('change', updateCalculation);
+
+        // --- WhatsApp Logic ---
+        document.getElementById('booking-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!selectedCar) return;
+
+            const start = startDateInput.value;
+            const end = endDateInput.value;
+            const days = getDaysDiff(start, end);
+
+            if (days <= 0) {
+                alert("Sila pilih tarikh yang sah.");
+                return;
+            }
+
+            const total = (days * selectedCar.price_per_day).toFixed(2);
+            
+            // Format: "Salam, saya berminat nak sewa kereta: [Car Name]. Dari [Start Date] hingga [End Date] ([Duration] hari). Total harga: RM[Total]. Adakah masih kosong?"
+            const message = `Salam, saya berminat nak sewa kereta: ${selectedCar.name}. Dari ${start} hingga ${end} (${days} hari). Total harga: RM${total}. Adakah masih kosong?`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodedMessage}`;
+
+            // Redirect
+            window.location.href = waUrl;
+        });
+
+    </script>
+</body>
+</html>

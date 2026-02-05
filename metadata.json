@@ -1,0 +1,5 @@
+{
+  "name": "Sewa Kereta Murah",
+  "description": "Mobile-first car rental application using Cloudflare Workers, D1, and Hono with WhatsApp booking integration.",
+  "requestFramePermissions": []
+}
