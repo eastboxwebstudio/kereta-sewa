@@ -12,4 +12,4 @@ binding = "ASSETS"
 binding = "DB"
 database_name = "sewa_kereta_db"
 # This is a placeholder UUID. Run 'npx wrangler d1 info sewa_kereta_db' to get your actual ID.
-database_id = "34947910-2e63-44f2-9856-5085c8892f30"
+database_id = "96498964-5694-4e82-ad07-1c43547f6961"
